@@ -3,14 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Anchor Navigation Example</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body { font-family: HelveticaNeue, Helvetica, sans-serif; margin: 0; }
+        #navigation { position: fixed; }
+        #navigation ul {list-style: none; }
+        #navigation li.current > a { color: black; }
+        #navigation a { color: white; font-size: 3rem; font-weight: bold; }
+        .box { color: white; min-height: 100vh; padding: 1px 0; display: flex; align-items: center; justify-content: center; }
+        .box h1 { font-size: 4em; color: inherit; font-weight: bold; margin: 0 6rem; text-align: center; }
+        .b-blue { background-color: #3469d1; }
+        .b-red { background-color: #c31e29; }
+        .b-black { background-color: #1a1a1a; }
+    </style>
 </head>
 <body>
 
+<nav id="navigation">
+    <ul>
+        <li class="current"><a href="./">Home</a></li>
+        <li><a href="./#page42">42</a></li>
+        <li>
+            <a href="./#end">The End</a>
+            <ul>
+                <li><a href="./#test">Test</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
 
+<main>
+    <div class="box b-blue">
+        <h1 id="home">Anchor Navigation</h1>
+    </div>
+
+    <article class="box b-red">
+        <h1 id="page42">Answer to the Ultimate Question of Life, The Universe, and Everything</h1>
+    </article>
+
+    <article class="box b-black">
+        <h1 id="end">The End?!</h1>
+    </article>
+</main>
 
 <script
         src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
+<script src="./anchor-navigation.js"></script>
 </body>
 </html>
