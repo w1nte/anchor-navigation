@@ -1,13 +1,33 @@
 # Anchor Navigation
 
-JS Anchor Navigation Library for more comfort on one-pager
+JS Anchor Navigation Library that automatically updates the navigation current class. [See Example]()
 
 ## Features
-* Navigation current item class update
-* modern web techniques for more performance
-* no polyfill required!
-
-## Requirements
-* jQuery > 3.x
+* Automatically updates navigation's current item.
+* Uses modern web technique for more performance
+* Polyfill's integrated!
 
 ## Usage
+#### with jQuery
+`````javascript
+$(document).ready(function() {
+
+    $('#navigation li').anchorNavigation({
+        "navigation_current_class": "current",
+        "home_anchor": "home",
+        "onclick_callback": function(e) {} // click on navigation links
+    });
+
+});
+`````
+
+#### without jQuery
+`````javascript
+var anchor_nav = new AnchorNavigation('#navigation li', {
+        "navigation_current_class": "current",
+        "home_anchor": "home",
+        "onclick_callback": function(e) {} // click on navigation links
+    });
+`````
+
+If you want smooth scrolling, see index.html (requires jquery)

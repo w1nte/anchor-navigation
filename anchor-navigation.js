@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const INTERSECTION_OBSERVER = ('IntersectionObserver' in window);
+const INTERSECTION_OBSERVER = ("IntersectionObserver" in window);
 //const INTERSECTION_OBSERVER = false; // debug
 
 
@@ -13,7 +13,6 @@ class AnchorNavigation {
             "navigation_current_class": "current",
             "home_anchor": "home",
             "onclick_callback": function (e) {
-                console.log(":)");
             }
         };
         this.config = this.extend({}, this.defaultConfig, {"navigation-entries": navigation_entries}, config);
@@ -50,9 +49,12 @@ class AnchorNavigation {
         nav_entries.entries.forEach(entry => {
             if (entry.key) {
                 let anchorDest = document.querySelector("#" + entry.key);
+
+                // observe elements
                 if (anchorDest && observer)
                     observer.observe(anchorDest);
 
+                // add entries event listeners
                 entry.anchor_element.addEventListener("click", function(e) {
                     $this.config["onclick_callback"](e);
                 });
@@ -68,7 +70,7 @@ class AnchorNavigation {
 
         let options = {
             root: null,
-            rootMargin: '0px',
+            rootMargin: "0px",
             threshold: 1
         };
 
@@ -93,18 +95,16 @@ class AnchorNavigation {
         nav_li_elements.forEach(li_element => {
             let anchor_element = li_element;
             if (li_element.tagName !== "A")
-                anchor_element = li_element.querySelector('a');
+                anchor_element = li_element.querySelector("a");
 
             let anchor = anchor_element.href.split("#")[1];
-            if (li_element.classList.contains(this.config['navigation_current_class'])) {
-                anchor = this.config['home_anchor'];
-                anchor_element.href += "#" + this.config['home_anchor'];
+            if (li_element.classList.contains(this.config["navigation_current_class"])) {
+                anchor = this.config["home_anchor"];
+                anchor_element.href += "#" + this.config["home_anchor"];
             }
             if (anchor)
                 nav_entries.add(anchor, li_element, anchor_element);
         });
-
-        console.log(nav_entries);
 
         return nav_entries;
     };
@@ -122,7 +122,7 @@ class AnchorNavigation {
     }
 
     static is_dictionary (variable) {
-        return typeof variable === 'object' && variable!==null && !(variable instanceof Array) && !(variable instanceof Date)
+        return typeof variable === "object" && variable!==null && !(variable instanceof Array) && !(variable instanceof Date)
     }
 }
 
@@ -162,6 +162,8 @@ class NavEntry {
 }
 
 
+// jQuery Integration
+if (typeof jQuery !== 'undefined')
 (function($) {
 
     $.fn.anchorNavigation = function(options={}) {

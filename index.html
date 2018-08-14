@@ -6,9 +6,9 @@
     <style>
         * { box-sizing: border-box; }
         html, body { font-family: HelveticaNeue, Helvetica, sans-serif; margin: 0; }
-        #navigation { position: fixed; }
+        #navigation { position: fixed; padding: 1rem; }
         #navigation ul {list-style: none; }
-        #navigation li.current > a { color: black; }
+        #navigation li.current > a, #navigation li > a:hover { color: black; }
         #navigation a { color: white; font-size: 3rem; font-weight: bold; }
         .box { color: white; min-height: 100vh; padding: 1px 0; display: flex; align-items: center; justify-content: center; }
         .box h1 { font-size: 4em; color: inherit; font-weight: bold; margin: 0 6rem; text-align: center; }
@@ -25,12 +25,7 @@
         <li><a href="./#page42">42</a></li>
         <li>
             <a href="./#end">The End</a>
-            <ul>
-                <li><a href="./#test">Test</a></li>
-            </ul>
         </li>
-        <li><a href="./page2/#test">42</a></li>
-        <li><a href="./page2">Weitere Seite</a></li>
     </ul>
 </nav>
 
@@ -52,7 +47,7 @@
         src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
-<script src="./anchor-navigation.js"></script>
+<script src="./dist/anchor-navigation.min.js"></script>
 <script>
     $(document).ready(function() {
 
