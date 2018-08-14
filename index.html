@@ -29,6 +29,8 @@
                 <li><a href="./#test">Test</a></li>
             </ul>
         </li>
+        <li><a href="./page2/#test">42</a></li>
+        <li><a href="./page2">Weitere Seite</a></li>
     </ul>
 </nav>
 
@@ -51,5 +53,29 @@
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
 <script src="./anchor-navigation.js"></script>
+<script>
+    $(document).ready(function() {
+
+        $('#navigation li').anchorNavigation({
+            "onclick_callback": function(e) {
+                var href = $(e.target).attr('href');
+                var match = href.match(new RegExp('(#.*?)$', 'i'));
+
+                if (match.length > 0 && match[1] !== "#") {
+                    href = match[1];
+                    var anchor_elm = $(href);
+
+                    if (anchor_elm.length > 0) {
+                        $('html, body').animate({
+                            scrollTop: href === '#home' ? 0 : (anchor_elm.parent().offset().top)
+                        }, 'slow');
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
+
+    });
+</script>
 </body>
 </html>
