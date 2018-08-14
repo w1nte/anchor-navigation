@@ -22,7 +22,7 @@ var AnchorNavigation = function () {
             "home_anchor": "home",
             "onclick_callback": function onclick_callback(e) {}
         };
-        this.config = this.extend({}, this.defaultConfig, { "navigation-entries": navigation_entries }, config);
+        this.config = this.extend({}, this.defaultConfig, { "navigation_entries": navigation_entries }, config);
 
         var nav_entries = this.find_nav_entries(this.config["navigation_entries"]);
 
@@ -195,7 +195,7 @@ if (typeof jQuery !== 'undefined') (function ($) {
     $.fn.anchorNavigation = function () {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        var anchor_nav = new AnchorNavigation(this[0], options);
+        var anchor_nav = new AnchorNavigation(this.selector, options);
         return this;
     };
 })(jQuery);

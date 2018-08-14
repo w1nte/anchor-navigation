@@ -15,7 +15,7 @@ class AnchorNavigation {
             "onclick_callback": function (e) {
             }
         };
-        this.config = this.extend({}, this.defaultConfig, {"navigation-entries": navigation_entries}, config);
+        this.config = this.extend({}, this.defaultConfig, {"navigation_entries": navigation_entries}, config);
 
         let nav_entries = this.find_nav_entries(this.config["navigation_entries"]);
 
@@ -167,7 +167,7 @@ if (typeof jQuery !== 'undefined')
 (function($) {
 
     $.fn.anchorNavigation = function(options={}) {
-        let anchor_nav = new AnchorNavigation(this[0], options);
+        let anchor_nav = new AnchorNavigation(this.selector, options);
         return this;
     };
 
