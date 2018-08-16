@@ -74,6 +74,9 @@
                 $('html, body').animate({
                     scrollTop: entry.key === 'home' ? 0 : (entry.heading_container.offsetTop)
                 }, 'slow');
+                if (window.history && window.history.pushState) {
+                    history.pushState("", document.title, entry.anchor_element.href);
+                }
                 e.preventDefault();
             }
         });
