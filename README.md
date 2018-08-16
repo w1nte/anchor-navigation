@@ -2,10 +2,6 @@
 
 JS Anchor Navigation Library that automatically updates the navigation current class if scrolling. [See Example](https://w1nte.github.io/anchor_navigation/)
 
-## Features
-* Easy to integrate!
-* Automatically updates navigation's current item.
-
 ## Usage
 ##### with jQuery
 ```javascript
