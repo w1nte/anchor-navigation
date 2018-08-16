@@ -1,6 +1,6 @@
 {
   "name": "anchor_navigation",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JS Anchor Navigation Library",
   "main": "anchor-navigation.js",
   "dependencies": {},

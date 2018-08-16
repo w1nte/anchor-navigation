@@ -3,43 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Anchor Navigation Example</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
-        html, body { font-family: HelveticaNeue, Helvetica, sans-serif; margin: 0; }
+        html, body { font-family: 'Roboto', sans-serif; margin: 0; }
+        h1 span { font-weight: lighter; }
         #navigation { position: fixed; padding: 1rem; }
         #navigation ul {list-style: none; }
         #navigation li.current > a, #navigation li > a:hover { color: black; }
         #navigation a { color: white; font-size: 3rem; font-weight: bold; }
-        .box { color: white; min-height: 100vh; padding: 1px 0; display: flex; align-items: center; justify-content: center; }
+        .box { color: white; }
         .box h1 { font-size: 4em; color: inherit; font-weight: bold; margin: 0 6rem; text-align: center; }
         .b-blue { background-color: #3469d1; }
         .b-red { background-color: #c31e29; }
         .b-black { background-color: #1a1a1a; }
+        .title { min-height: 100vh; padding: 1px 0; display: flex; align-items: center; justify-content: center; }
+        .content { width: 50%; margin: 0 auto; padding: 1px 0 100px 0; font-size: 2rem; font-weight: lighter; text-align: center; }
     </style>
 </head>
 <body>
 
 <nav id="navigation">
     <ul>
-        <li class="current"><a href="./">Home</a></li>
-        <li><a href="./#page42">42</a></li>
-        <li>
-            <a href="./#end">The End</a>
-        </li>
+        <li class="current test"><a href="./">Home</a></li>
+        <li><a href="./#page42"><span>42</span></a></li>
+        <li><a href="./#end">The End</a></li>
     </ul>
 </nav>
 
 <main>
-    <div class="box b-blue">
-        <h1 id="home">Anchor Navigation</h1>
-    </div>
+    <article class="box b-blue">
+        <div class="title">
+            <h1 id="home">Anchor-Navigation <span>.JS</span></h1>
+        </div>
+        <div class="content">
+            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        </div>
+    </article>
 
     <article class="box b-red">
-        <h1 id="page42">Answer to the Ultimate Question of Life, The Universe, and Everything</h1>
+        <div class="title">
+            <h1 id="page42">Answer to the Ultimate Question of Life, The Universe, and Everything</h1>
+        </div>
+        <div class="content">
+            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        </div>
     </article>
 
     <article class="box b-black">
-        <h1 id="end">The End?!</h1>
+        <div class="title">
+            <h1 id="end">The End?!</h1>
+        </div>
+        <div class="content">
+            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        </div>
     </article>
 </main>
 
@@ -47,26 +64,17 @@
         src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
-<script src="./dist/anchor-navigation.min.js"></script>
+<script src="./dist/anchor-navigation.js"></script>
 <script>
     $(document).ready(function() {
 
         $('#navigation li').anchorNavigation({
-            "onclick_callback": function(e) {
-                var href = $(e.target).attr('href');
-                var match = href.match(new RegExp('(#.*?)$', 'i'));
-
-                if (match.length > 0 && match[1] !== "#") {
-                    href = match[1];
-                    var anchor_elm = $(href);
-
-                    if (anchor_elm.length > 0) {
-                        $('html, body').animate({
-                            scrollTop: href === '#home' ? 0 : (anchor_elm.parent().offset().top)
-                        }, 'slow');
-                        e.preventDefault();
-                    }
-                }
+            "heading_container": ".box",
+            "navigation_onclick_callback": function(entry, e) {
+                $('html, body').animate({
+                    scrollTop: entry.key === 'home' ? 0 : (entry.heading_container.offsetTop)
+                }, 'slow');
+                e.preventDefault();
             }
         });
 

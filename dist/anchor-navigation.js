@@ -6,115 +6,122 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var INTERSECTION_OBSERVER = "IntersectionObserver" in window;
-//const INTERSECTION_OBSERVER = false; // debug
-
-
 var AnchorNavigation = function () {
-    function AnchorNavigation(navigation_entries, config) {
+    function AnchorNavigation(navigation_list_elements, config) {
         _classCallCheck(this, AnchorNavigation);
 
         var $this = this;
 
         this.defaultConfig = {
-            "navigation_entries": "#navigation li",
-            "navigation_current_class": "current",
+            "navigation_list_elements": "#navigation li",
+            "navigation_current_class": ["current"],
+            "heading_container": "div, section, article",
             "home_anchor": "home",
-            "onclick_callback": function onclick_callback(e) {}
+            "threshold": 0.5,
+            "timeout": 250, // debounce timeout
+            "navigation_onclick_callback": function navigation_onclick_callback(entry, e) {},
+            "navigation_onupdate_callback": function navigation_onupdate_callback(entry) {}
         };
-        this.config = this.extend({}, this.defaultConfig, { "navigation_entries": navigation_entries }, config);
+        this.config = AnchorNavigation.extend({}, this.defaultConfig, { "navigation_list_elements": navigation_list_elements }, config);
 
-        var nav_entries = this.find_nav_entries(this.config["navigation_entries"]);
+        this.nav_entries = new NavEntries();
 
-        var observer = this.register_observer(function (entry) {
-            nav_entries.set_current_page_class(entry.id, $this.config["navigation_current_class"]);
-        });
-
-        if (!observer) {
-            // fallback
-            var si = 0,
-                scroll_precision = 5;
-            window.addEventListener("scroll", function () {
-                si++;
-                if (si > scroll_precision) {
-
-                    nav_entries.entries.forEach(function (entry) {
-                        if (entry.key) {
-                            var anchorDest = document.querySelector("#" + entry.key);
-                            if (anchorDest) {
-                                var domRect = anchorDest.getBoundingClientRect();
-                                if (domRect.top < window.innerHeight && domRect.top > 0) nav_entries.set_current_page_class(anchorDest.id, $this.config["navigation_current_class"]);
-                            }
-                        }
-                    });
-
-                    si = 0;
-                }
-            });
-        }
-
-        nav_entries.entries.forEach(function (entry) {
-            if (entry.key) {
-                var anchorDest = document.querySelector("#" + entry.key);
-
-                // observe elements
-                if (anchorDest && observer) observer.observe(anchorDest);
-
-                // add entries event listeners
-                entry.anchor_element.addEventListener("click", function (e) {
-                    $this.config["onclick_callback"](e);
-                });
-            }
-        });
+        this.update_nav_entries();
     }
 
     _createClass(AnchorNavigation, [{
-        key: "register_observer",
-        value: function register_observer(callback) {
-            if (!INTERSECTION_OBSERVER) return false;
+        key: "update_nav_entries",
+        value: function update_nav_entries() {
+            var $this = this;
 
-            var observer = void 0;
+            this.nav_entries = this.find_nav_entries(this.config.navigation_list_elements);
 
-            var options = {
-                root: null,
-                rootMargin: "0px",
-                threshold: 1
-            };
+            var is_scrolling = void 0;
+            window.addEventListener("scroll", function () {
+                window.clearTimeout(is_scrolling);
+                is_scrolling = setTimeout(function () {
 
-            var cb = function cb(entries, observer) {
+                    $this.update($this.nav_entries);
+                }, $this.config.timeout);
+            }, false);
 
-                entries.forEach(function (entry) {
-                    if (entry.intersectionRatio >= 1) {
-                        callback(entry.target);
+            this.nav_entries.entries.forEach(function (entry) {
+                if (entry.anchor_element) {
+                    // add entries event listeners
+                    entry.anchor_element.addEventListener("click", function (e) {
+                        $this.config.navigation_onclick_callback(entry, e);
+                        $this.nav_entries.set_current_page_class(entry.key, $this.config.navigation_current_class);
+                    });
+                }
+            });
+        }
+    }, {
+        key: "update",
+        value: function update(nav_entries) {
+            var _this = this;
+
+            var padding = window.innerHeight * this.config.threshold;
+
+            nav_entries.entries.forEach(function (entry) {
+
+                if (entry.key) {
+                    var domRect = entry.heading_container.getBoundingClientRect();
+
+                    if (typeof domRect.height !== "undefined" && domRect.height <= padding) {
+                        padding *= domRect.height / padding - 0.1; // adjust the threshold
                     }
-                });
-            };
 
-            observer = new IntersectionObserver(cb, options);
-
-            return observer;
+                    if (domRect.top - padding <= 0 && domRect.bottom - padding >= 0) {
+                        if (nav_entries.set_current_page_class(entry.key, _this.config.navigation_current_class)) _this.config.navigation_onupdate_callback(entry);
+                    }
+                }
+            });
         }
     }, {
         key: "find_nav_entries",
         value: function find_nav_entries(li_elements) {
-            var _this = this;
+            var _this2 = this;
 
             var nav_entries = new NavEntries();
             var nav_li_elements = document.querySelectorAll(li_elements);
 
             nav_li_elements.forEach(function (li_element) {
                 var anchor_element = li_element;
-                if (li_element.tagName !== "A") anchor_element = li_element.querySelector("a");
-
-                var anchor = anchor_element.href.split("#")[1];
-                if (li_element.classList.contains(_this.config["navigation_current_class"])) {
-                    anchor = _this.config["home_anchor"];
-                    anchor_element.href += "#" + _this.config["home_anchor"];
+                if (anchor_element.tagName !== "A") {
+                    anchor_element = li_element.querySelector("a");
                 }
-                if (anchor) nav_entries.add(anchor, li_element, anchor_element);
+
+                var key = anchor_element.href.split("#")[1];
+
+                if (li_element.classList.contains(_this2.config.navigation_current_class)) {
+                    key = _this2.config.home_anchor;
+                    anchor_element.href += "#" + _this2.config.home_anchor;
+                }
+
+                var heading_element = document.querySelector("#" + key);
+                var heading_container = AnchorNavigation.querySelectorParent(heading_element, _this2.config.heading_container);
+
+                if (!heading_container) {
+                    heading_container = heading_element;
+                }
+
+                if (key && heading_element) {
+                    nav_entries.add(key, li_element, anchor_element, heading_element, heading_container);
+                }
             });
 
             return nav_entries;
+        }
+    }], [{
+        key: "querySelectorParent",
+        value: function querySelectorParent(elm, selector) {
+            while (elm) {
+                elm = elm.parentElement;
+                if (elm && elm.matches(selector)) {
+                    return elm;
+                }
+            }
+            return false;
         }
     }, {
         key: "extend",
@@ -126,15 +133,27 @@ var AnchorNavigation = function () {
             for (var i = 1; i < args.length; i++) {
                 for (var key in args[i]) {
                     if (args[i].hasOwnProperty(key)) {
-                        if (AnchorNavigation.is_dictionary(args[i][key])) args[0][key] = this.extend(args[0][key], args[i][key]);else args[0][key] = args[i][key];
+                        if (AnchorNavigation.is_dictionary(args[i][key])) args[0][key] = AnchorNavigation.extend(args[0][key], args[i][key]);else args[0][key] = args[i][key];
                     }
                 }
             }return args[0];
         }
-    }], [{
+    }, {
         key: "is_dictionary",
         value: function is_dictionary(variable) {
             return (typeof variable === "undefined" ? "undefined" : _typeof(variable)) === "object" && variable !== null && !(variable instanceof Array) && !(variable instanceof Date);
+        }
+    }, {
+        key: "buildThresholdList",
+        value: function buildThresholdList() {
+            var steps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
+
+            var thresholds = [.0];
+            for (var i = 1.0; i <= steps; i++) {
+                var ratio = i / steps;
+                thresholds.push(ratio);
+            }
+            return thresholds;
         }
     }]);
 
@@ -146,6 +165,7 @@ var NavEntries = function () {
         _classCallCheck(this, NavEntries);
 
         this.entries = [];
+        this.current_key = undefined;
     }
 
     _createClass(NavEntries, [{
@@ -155,8 +175,8 @@ var NavEntries = function () {
         }
     }, {
         key: "add",
-        value: function add(key, list_element, anchor_element) {
-            var nav_entry = new NavEntry(key, list_element, anchor_element);
+        value: function add(key, list_element, anchor_element, heading_element, heading_container) {
+            var nav_entry = new NavEntry(key, list_element, anchor_element, heading_element, heading_container);
             this.push(nav_entry);
         }
     }, {
@@ -169,22 +189,42 @@ var NavEntries = function () {
     }, {
         key: "set_current_page_class",
         value: function set_current_page_class(key, class_name) {
+            if (this.current_key === key) {
+                return false;
+            }
+
+            if (!Array.isArray(class_name)) {
+                class_name = [class_name];
+            }
+
             this.entries.map(function (entry) {
                 return entry.list_element.classList.remove(class_name);
             });
-            this.find(key).list_element.classList.add(class_name);
+            var entry = this.find(key);
+
+            if (!entry) {
+                return false;
+            }
+
+            entry.list_element.classList.add(class_name);
+
+            this.current_key = key;
+
+            return true;
         }
     }]);
 
     return NavEntries;
 }();
 
-var NavEntry = function NavEntry(key, list_element, anchor_element) {
+var NavEntry = function NavEntry(key, list_element, anchor_element, heading_element, heading_container) {
     _classCallCheck(this, NavEntry);
 
     this.key = key; // anchor without hash for identification
     this.list_element = list_element; // the list element with the current page class e.g <li>
     this.anchor_element = anchor_element; // the anchor element with the url e.g <a>
+    this.heading_element = heading_element; // anchor destination
+    this.heading_container = heading_container; // container that contains the heading element
 };
 
 // jQuery Integration
@@ -195,7 +235,7 @@ if (typeof jQuery !== 'undefined') (function ($) {
     $.fn.anchorNavigation = function () {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        var anchor_nav = new AnchorNavigation(this.selector, options);
+        var anchor_nav = new AnchorNavigation(this.selector ? this.selector : this[0], options);
         return this;
     };
 })(jQuery);
